@@ -1,5 +1,7 @@
 import Vue from 'vue'
-import Element from 'element-ui'
+import Element, { Message, MessageBox } from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
+Vue.prototype.$message = Message
+Vue.prototype.$confirm = MessageBox
 
 Vue.use(Element)
