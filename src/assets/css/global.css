@@ -16,4 +16,8 @@ html,body,#app{
 }
 .el-pagination{
     margin-top: 15px;
+},
+.vcenter{
+    display: flex;
+    align-items: center;
 }

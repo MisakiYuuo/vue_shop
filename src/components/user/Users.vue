@@ -66,7 +66,12 @@
               content="删除角色"
               placement="top"
               :enterable="false"
-              ><el-button type="danger" icon="el-icon-delete" circle  @click="removeUserById(scope.row.id)"></el-button
+              ><el-button
+                type="danger"
+                icon="el-icon-delete"
+                circle
+                @click="removeUserById(scope.row.id)"
+              ></el-button
             ></el-tooltip>
 
             <el-tooltip
@@ -79,6 +84,7 @@
                 type="warning"
                 icon="el-icon-star-off"
                 circle
+                @click="distributeUser(scope.row)"
               ></el-button>
             </el-tooltip>
           </template>
@@ -136,16 +142,21 @@
       width="30%"
       @close="editFromClose"
     >
-    <!-- form表单 -->
-      <el-form  :model="editFrom" :rules="addFromRules" label-width="80px" ref="editFromRef">
+      <!-- form表单 -->
+      <el-form
+        :model="editFrom"
+        :rules="addFromRules"
+        label-width="80px"
+        ref="editFromRef"
+      >
         <el-form-item label="用户名称" prop="">
-                <el-input :disabled="true" v-model="editFrom.username"></el-input>
+          <el-input :disabled="true" v-model="editFrom.username"></el-input>
         </el-form-item>
         <el-form-item label="电话" prop="mobile">
-                <el-input v-model="editFrom.mobile"></el-input>
+          <el-input v-model="editFrom.mobile"></el-input>
         </el-form-item>
         <el-form-item label="邮箱" prop="email">
-                <el-input v-model="editFrom.email"></el-input>
+          <el-input v-model="editFrom.email"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -156,6 +167,32 @@
       </span>
     </el-dialog>
     <!-- ------------------ -->
+    <!-- 分配角色弹窗 -->
+    <el-dialog
+      title="分配角色"
+      :visible.sync="distributeDialogVisible"
+      width="50%"
+      @close="distributeDialogClose"
+    >
+      <div>
+        <p>当前用户:{{ userInfo.username }}</p>
+        <p>当前角色:{{ userInfo.role_name }}</p>
+      </div>
+      <el-select v-model="rolesListValue" placeholder="请选择角色">
+        <el-option
+          v-for="item in this.rolesList"
+          :key="item.id"
+          :label="item.roleName"
+          :value="item.roleName"
+        >
+        </el-option>
+      </el-select>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="distributeDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="saveRoleInfo">确 定</el-button>
+      </span>
+    </el-dialog>
+    <!-- -------- -->
   </div>
 </template>
 
@@ -186,6 +223,10 @@ export default {
         pagenum: 1,
         pagesize: 2
       },
+      rolesListValue: '',
+      userInfo: {},
+      rolesList: [],
+      distributeDialogVisible: false,
       userList: [],
       total: 0,
       addDialogVisible: false,
@@ -297,9 +338,14 @@ export default {
     },
     editUserInfo (id) {
       // this.$refs.editFromRef.validate 表单预验证
-      this.$refs.editFromRef.validate(async v => {
-        if (!v) { return this.$message.error('请填写正确的信息') }
-        const { data: res } = await this.$axios.put('users/' + id, this.editFrom)
+      this.$refs.editFromRef.validate(async (v) => {
+        if (!v) {
+          return this.$message.error('请填写正确的信息')
+        }
+        const { data: res } = await this.$axios.put(
+          'users/' + id,
+          this.editFrom
+        )
         // console.log(res)
         if (res.meta.status !== 200) {
           return this.$message.error(res.meta.msg)
@@ -309,13 +355,17 @@ export default {
         this.$message.success(res.meta.msg)
       })
     },
-    async  removeUserById (id) {
+    async removeUserById (id) {
       // 删除
-      const res = await this.$confirm('此操作将永久删除该用户, 是否继续?', '警告!', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).catch(err => err)
+      const res = await this.$confirm(
+        '此操作将永久删除该用户, 是否继续?',
+        '警告!',
+        {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }
+      ).catch((err) => err)
       // console.log(res)
       // 确认删除 返回字符串 confirm
       // 取消 返回cancel 字符串
@@ -328,6 +378,39 @@ export default {
       }
       this.getUserList()
       this.$message.success(resS.meta.msg)
+    },
+    async distributeUser (userInfo) {
+      this.userInfo = userInfo
+      const { data: res } = await this.$axios.get('roles')
+      // console.log(res)
+      if (res.meta.status !== 200) {
+        return this.$message.error(res.meta.msg)
+      }
+      this.rolesList = res.data
+      this.distributeDialogVisible = true
+      return this.$message.success(res.meta.msg)
+    },
+    async saveRoleInfo () {
+      if (!this.rolesListValue) {
+        return this.$message.error('请选择新角色')
+      }
+      const { data: res } = await this.$axios.put(
+        `users/${this.userInfo.id}/role`,
+        {
+          rid: this.rolesListValue
+        }
+      )
+      console.log(this.rolesListValue)
+      if (res.meta.status !== 200) {
+        return this.$message.error(res.meta.msg)
+      }
+      this.distributeDialogVisible = false
+      this.getUserList()
+      return this.$message.success(res.meta.msg)
+    },
+    distributeDialogClose () {
+      this.rolesListValue = ''
+      this.userInfo = {}
     }
   }
 }

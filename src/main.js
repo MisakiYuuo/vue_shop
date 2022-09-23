@@ -8,6 +8,9 @@ import './plugins/element.js'
 import axios from 'axios'
 // css
 import '@/assets/css/global.css'
+
+import moment from 'moment'
+
 axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
 axios.interceptors.request.use(config => {
   // console.log(config)
@@ -16,6 +19,7 @@ axios.interceptors.request.use(config => {
 })
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
+Vue.prototype.$moment = moment
 
 new Vue({
   router,
