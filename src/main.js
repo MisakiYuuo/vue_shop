@@ -8,8 +8,12 @@ import './plugins/element.js'
 import axios from 'axios'
 // css
 import '@/assets/css/global.css'
+// import '@/plugins/ZkTable.js'
+import ZkTable from 'vue-table-with-tree-grid'
 
 import moment from 'moment'
+
+Vue.use(ZkTable)
 
 axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
 axios.interceptors.request.use(config => {
@@ -20,7 +24,6 @@ axios.interceptors.request.use(config => {
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
 Vue.prototype.$moment = moment
-
 new Vue({
   router,
   render: h => h(App)
