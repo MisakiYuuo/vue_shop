@@ -10,6 +10,9 @@ import axios from 'axios'
 import '@/assets/css/global.css'
 // import '@/plugins/ZkTable.js'
 import ZkTable from 'vue-table-with-tree-grid'
+import '@/plugins/vue-quill-editor.js'
+
+import '@/plugins/dateFormat.js'
 
 import moment from 'moment'
 
@@ -21,6 +24,7 @@ axios.interceptors.request.use(config => {
   config.headers.Authorization = sessionStorage.getItem('token')
   return config
 })
+
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
 Vue.prototype.$moment = moment

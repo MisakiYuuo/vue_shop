@@ -32,14 +32,24 @@ const router = new VueRouter({
         { path: '/rights', component: Rights },
         { path: '/roles', component: Roles },
         { path: '/categories', component: Cate },
-        { path: '/params', component: Params }
+        { path: '/params', component: Params },
+        {
+          path: '/goods',
+          component: () => import('@/components/godds/Goods.vue')
+        },
+        {
+          path: '/goods/add',
+          component: () => import('@/components/godds/AddGoods.vue')
+        }
       ]
     }
   ]
 })
 // 挂载路由导航守卫
 router.beforeEach((to, from, next) => {
-  if (to.path === '/login') { return next() }
+  if (to.path === '/login') {
+    return next()
+  }
   const tokenStr = sessionStorage.getItem('token')
   if (!tokenStr) {
     return next('/login')
